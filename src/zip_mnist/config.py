@@ -7,7 +7,9 @@ class Config(BaseModel):
     num_features_after_compression: int = 500
     enable_normalization: bool = True
     enable_pca: bool = True
-    pca_n_components: int = 400
+    pca_n_components: int = 50
+    enable_autoencoder: bool = False
+    autoencoder_encoding_dim: int = 50
 
 _config = Config()
 print(f"Config initialized: {_config.model_dump()}")

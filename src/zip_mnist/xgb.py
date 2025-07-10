@@ -6,6 +6,7 @@ from .data import load_mnist, transform_features
 from .xgb_timeout import TimeoutCallback
 from .schema import Job, insert_job
 from sklearn.decomposition import PCA
+from .autoencoder import fit_autoencoder, encode
 from .config import get_config
 
 def get_xgb_callbacks(): 
@@ -27,6 +28,11 @@ def run_xgb():
         pca = fit_pca(X_train)
         X_train = pca.transform(X_train)
         X_test = pca.transform(X_test)
+
+    if get_config("enable_autoencoder"):
+        encoder = fit_autoencoder(X_train)
+        X_train = encode(encoder, X_train)
+        X_test = encode(encoder, X_test)
 
     print(f"X_train shape: {X_train.shape}")
     print(f"X_test shape: {X_test.shape}")
