@@ -7,7 +7,7 @@ from .xgb_timeout import TimeoutCallback
 from .schema import Job, insert_job
 from sklearn.decomposition import PCA
 from .autoencoder import fit_autoencoder, encode
-from .config import get_config
+from .config import get_config, set_config, Config 
 
 def get_xgb_callbacks(): 
     callbacks = []
@@ -19,7 +19,10 @@ def fit_pca(X: np.ndarray) -> PCA:
     pca.fit(X)
     return pca 
 
-def run_xgb(): 
+def run_xgb(config: Config = Config()): 
+    set_config(config)
+    time_start = time.time()
+
     X_train, y_train, X_test, y_test = load_mnist()
     X_train = transform_features(X_train)
     X_test = transform_features(X_test)
@@ -47,15 +50,17 @@ def run_xgb():
             # 'eta': 0.3,
     }
 
-    total_time = time.time()
+    time_before_training = time.time()
     model = xgb.train(
         params,
         dtrain, 
         callbacks=get_xgb_callbacks()
     )
 
-    total_training_time = time.time() - total_time
-    print(f"Total training time: {total_training_time:.2f} seconds")
+    time_end = time.time()
+    time_training = time_end - time_before_training
+    time_total = time_end - time_start
+    print(f"Total training time: {time_training:.2f} seconds")
 
     # Train accuracy
     y_pred = model.predict(dtrain)
@@ -67,11 +72,15 @@ def run_xgb():
     print(f'Test Accuracy: {accuracy * 100:.2f}%')
 
     job = Job(
-        model_name="xgb",
+        name=get_config("name"),
         test_accuracy=accuracy,
-        total_training_time=total_training_time
+        train_accuracy=train_accuracy,
+        total_training_time=time_training,
+        total_time=time_total
     )
-    insert_job(job)
+    print(job.model_dump_json())
+    if get_config("save_to_db"):
+        insert_job(job)
 
 if __name__ == "__main__":
     run_xgb()

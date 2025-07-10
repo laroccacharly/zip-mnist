@@ -2,7 +2,8 @@ import zlib
 import numpy as np
 from .config import get_config
 
-def truncate_or_pad_features(X: np.ndarray, target_num_features: int = get_config("num_features_after_compression")) -> np.ndarray:
+def truncate_or_pad_features(X: np.ndarray) -> np.ndarray:
+    target_num_features = get_config("num_features_after_compression")
     current_len = len(X)
     if current_len > target_num_features:
         return X[:target_num_features]

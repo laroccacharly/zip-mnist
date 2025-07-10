@@ -2,6 +2,7 @@
 # requires-python = ">=3.12"
 # dependencies = [
 #     "pandas",
+#     "tabulate",
 # ]
 # ///
 import sqlite3
@@ -42,7 +43,7 @@ def show_tables(db_path, num_rows=10):
             try:
                 # Using pandas to read and print the table in a pretty format
                 df = pd.read_sql_query(f'SELECT * FROM "{table_name}" LIMIT {num_rows}', con)
-                print(df)
+                print(df.to_markdown(index=False))
             
             except pd.io.sql.DatabaseError as e:
                 print(f"Could not read table '{table_name}': {e}")

@@ -36,12 +36,12 @@ def fit_autoencoder(X: np.ndarray) -> models.Model:
     
     _history = autoencoder.fit(
         X, X, 
-        epochs=10,  # Increased for better training
-        batch_size=32,  # Larger batch for efficiency on MNIST
+        epochs=10,  
+        batch_size=128,  
         shuffle=True,
-        validation_split=0.2,  # Use 20% for validation
+        validation_split=0.2,  
         callbacks=[early_stopping],
-        verbose=1  # Explicitly set to show progress
+        verbose=1  
     )
 
     return encoder
