@@ -1,11 +1,11 @@
 import xgboost as xgb
-
 import time
+from .config import get_config
 
 class TimeoutCallback(xgb.callback.TrainingCallback):
-    def __init__(self, time_limit_seconds: float = 10):
+    def __init__(self):
         self.start_time = time.time()
-        self.time_limit_seconds = time_limit_seconds
+        self.time_limit_seconds = get_config("time_limit_seconds")
 
     def after_iteration(self, model, epoch, evals_log):
         elapsed_time = time.time() - self.start_time
