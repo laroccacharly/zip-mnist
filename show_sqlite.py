@@ -39,16 +39,27 @@ def show_tables(db_path, num_rows=10):
             row_count = cursor.fetchone()[0]
             
             print(f"--- Table: {table_name} (Total rows: {row_count}) ---")
-            
+
+            cursor.execute(f"PRAGMA table_info('{table_name}')")
+            column_info = cursor.fetchall()
+            columns = [info[1] for info in column_info if info[1] != 'id']
+
+            if not columns:
+                print("No non-id columns to display.")
+                print("\n" + "="*50 + "\n")
+                continue
+
+            select_clause = ', '.join(f'"{col}"' for col in columns)
+            query = f'SELECT {select_clause} FROM "{table_name}" LIMIT {num_rows}'
+
             try:
-                # Using pandas to read and print the table in a pretty format
-                df = pd.read_sql_query(f'SELECT * FROM "{table_name}" LIMIT {num_rows}', con)
+                df = pd.read_sql_query(query, con)
                 print(df.to_markdown(index=False))
-            
+
             except pd.io.sql.DatabaseError as e:
                 print(f"Could not read table '{table_name}': {e}")
 
-            print("\\n" + "="*50 + "\\n")
+            print("\n" + "="*50 + "\n")
 
     except sqlite3.Error as e:
         print(f"Database error: {e}")
